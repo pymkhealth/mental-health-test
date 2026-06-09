@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบประเมินสุขภาพจิต - รพ.ค่ายพระยอดเมืองขวาง</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap');
+        body { font-family: 'Sarabun', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen py-10 px-4">
+
+    <!-- ปุ่ม Admin (มุมขวาบน) -->
+    <div class="max-w-4xl mx-auto flex justify-end mb-2">
+        <button onclick="openAdminModal()" class="text-xs text-gray-400 hover:text-gray-600">🔒 สำหรับเจ้าหน้าที่ (Admin)</button>
+    </div>
+
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6 md:p-8">
+
+        <!-- Header -->
+        <div class="border-b pb-6 mb-6 text-center flex flex-col items-center justify-center">
+            <img src="1772032324_b23e23edbc26944b.jpg" alt="โลโก้หน่วยงาน" class="h-28 w-auto mb-3 object-contain" onerror="this.style.display='none'">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">แบบคัดกรองสุขภาวะทางจิต</h1>
+            <p class="text-gray-600 font-medium mt-1">โรงพยาบาลค่ายพระยอดเมืองขวาง</p>
+        </div>
+
+        <!-- Step 1: ข้อมูลส่วนตัว -->
+        <div id="step-1" class="space-y-6">
+            <h2 class="text-xl font-semibold text-gray-700 border-l-4 border-red-600 pl-2">ส่วนที่ 1: ข้อมูลส่วนตัว</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ยศ / คำนำหน้านาม</label>
+                    <input type="text" id="rank" placeholder="เช่น พลฯ, ส.ต., ร.ต." class="w-full px-4 py-2 border rounded-md outline-none focus:ring-2 focus:ring-red-400">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อ - สกุล <span class="text-red-500">*</span></label>
+                    <input type="text" id="fullname" required class="w-full px-4 py-2 border rounded-md outline-none focus:ring-2 focus:ring-red-400">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">หน่วยงาน / สังกัด <span class="text-red-500">*</span></label>
+                    <input type="text" id="unit" placeholder="เช่น ร.3 พัน.1, สง.รพ.ค่ายฯ" required class="w-full px-4 py-2 border rounded-md outline-none focus:ring-2 focus:ring-red-400">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">เบอร์โทรติดต่อ <span class="text-red-500">*</span></label>
+                    <input type="tel" id="phone" required class="w-full px-4 py-2 border rounded-md outline-none focus:ring-2 focus:ring-red-400">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">ตำแหน่งงานที่ได้รับมอบหมาย <span class="text-red-500">*</span></label>
+                    <input type="text" id="job" required class="w-full px-4 py-2 border rounded-md outline-none focus:ring-2 focus:ring-red-400">
+                </div>
+            </div>
+            <div class="flex justify-end pt-4">
+                <button onclick="goToStep2()" class="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-md shadow">ถัดไป: ทำแบบประเมิน →</button>
+            </div>
+        </div>
+
+        <!-- Step 2: แบบประเมิน -->
+        <div id="step-2" class="hidden space-y-8">
+            <div class="bg-red-50 p-4 rounded-lg text-sm text-red-900 border border-red-100">
+                <strong>ผู้รับการประเมิน:</strong> <span id="review-name"></span> |
+                <strong>หน่วยงาน:</strong> <span id="review-unit"></span> |
+                <strong>ตำแหน่ง:</strong> <span id="review-job"></span>
+            </div>
+
+            <div>
+                <h2 class="text-lg font-semibold text-gray-800 bg-gray-200 p-2 rounded">ส่วนที่ 1: แบบประเมินภาวะซึมเศร้า 9 คำถาม (9Q)</h2>
+                <div class="space-y-4 mt-4" id="questions-9q"></div>
+            </div>
+
+            <hr class="border-gray-300">
+
+            <div>
+                <h2 class="text-lg font-semibold text-gray-800 bg-gray-200 p-2 rounded">ส่วนที่ 2: แบบประเมินการฆ่าตัวตาย 8 คำถาม (8Q)</h2>
+                <div class="space-y-4 mt-4" id="questions-8q"></div>
+            </div>
+
+            <div class="flex justify-between items-center pt-4">
+                <button onclick="goToStep1()" class="text-gray-600 hover:underline font-medium">← ย้อนกลับ</button>
+                <button onclick="calculateAndSave()" id="btn-submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-3 rounded-md shadow-lg">ส่งข้อมูลและดูผลลัพธ์</button>
+            </div>
+        </div>
+
+        <!-- ผลลัพธ์ -->
+        <div id="result-section" class="hidden mt-8 p-6 rounded-lg border-2 text-center space-y-4">
+            <h2 class="text-2xl font-bold">บันทึกข้อมูลสำเร็จ ผลการประเมินของคุณคือ</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left max-w-md mx-auto">
+                <div class="p-4 bg-white rounded shadow border">
+                    <p class="text-sm text-gray-500">คะแนนภาวะซึมเศร้า (9Q)</p>
+                    <p class="text-xl font-bold mt-1"><span id="score-9q">0</span> คะแนน</p>
+                    <div id="badge-9q" class="inline-block px-3 py-1 text-xs font-bold rounded-full mt-2"></div>
+                </div>
+                <div class="p-4 bg-white rounded shadow border">
+                    <p class="text-sm text-gray-500">คะแนนแนวโน้มฆ่าตัวตาย (8Q)</p>
+                    <p class="text-xl font-bold mt-1"><span id="score-8q">0</span> คะแนน</p>
+                    <div id="badge-8q" class="inline-block px-3 py-1 text-xs font-bold rounded-full mt-2"></div>
+                </div>
+            </div>
+            <div id="color-advice" class="text-sm font-semibold p-3 rounded max-w-md mx-auto mt-2"></div>
+            <div class="pt-4">
+                <button onclick="location.reload()" class="bg-gray-800 text-white px-4 py-2 rounded text-sm">ปิดหน้านี้</button>
+            </div>
+        </div>
+
+        <!-- Admin Dashboard -->
+        <div id="admin-section" class="hidden space-y-6">
+            <div class="flex justify-between items-center border-b pb-4 flex-wrap gap-2">
+                <h2 class="text-xl font-bold text-gray-800">📊 รายงานผลการประเมิน (เจ้าหน้าที่)</h2>
+                <div class="flex gap-2 flex-wrap">
+                    <button onclick="loadAdminData()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm font-semibold">🔄 รีเฟรชข้อมูล</button>
+                    <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded text-sm font-semibold">⬇ Export Excel</button>
+                    <button onclick="closeAdmin()" class="bg-gray-500 text-white px-3 py-1 rounded text-sm">กลับหน้าหลัก</button>
+                </div>
+            </div>
+
+            <!-- สรุปสถิติ -->
+            <div id="admin-summary" class="grid grid-cols-2 md:grid-cols-4 gap-3 hidden">
+                <div class="bg-gray-50 border rounded-lg p-3 text-center">
+                    <p class="text-xs text-gray-500">ผู้เข้าประเมินทั้งหมด</p>
+                    <p class="text-2xl font-bold text-gray-800" id="stat-total">0</p>
+                </div>
+                <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-center">
+                    <p class="text-xs text-emerald-700">กลุ่มสีเขียว (ปกติ)</p>
+                    <p class="text-2xl font-bold text-emerald-700" id="stat-green">0</p>
+                </div>
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-center">
+                    <p class="text-xs text-yellow-700">กลุ่มสีเหลือง (เฝ้าระวัง)</p>
+                    <p class="text-2xl font-bold text-yellow-700" id="stat-yellow">0</p>
+                </div>
+                <div class="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
+                    <p class="text-xs text-red-700">กลุ่มสีแดง (อันตราย)</p>
+                    <p class="text-2xl font-bold text-red-700" id="stat-red">0</p>
+                </div>
+            </div>
+
+            <!-- ตัวกรอง -->
+            <div class="flex flex-wrap gap-3 items-center bg-gray-50 p-3 rounded-lg border">
+                <span class="text-sm font-medium text-gray-600">กรองตาม:</span>
+                <select id="filter-color" onchange="filterTable()" class="text-sm border rounded px-2 py-1">
+                    <option value="">ทุกกลุ่มสี</option>
+                    <option value="เขียว">🟢 สีเขียว</option>
+                    <option value="เหลือง">🟡 สีเหลือง</option>
+                    <option value="แดง">🔴 สีแดง</option>
+                </select>
+                <input id="filter-search" type="text" placeholder="ค้นหาชื่อ / หน่วยงาน..." oninput="filterTable()" class="text-sm border rounded px-2 py-1 flex-1 min-w-40">
+            </div>
+
+            <!-- ตาราง -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-gray-600 border">
+                    <thead class="text-xs text-white uppercase bg-red-700">
+                        <tr>
+                            <th class="px-3 py-3">วัน-เวลาที่ทำ</th>
+                            <th class="px-3 py-3">ยศ-ชื่อ-สกุล</th>
+                            <th class="px-3 py-3">หน่วยงาน/สังกัด</th>
+                            <th class="px-3 py-3">เบอร์โทร</th>
+                            <th class="px-3 py-3">ตำแหน่ง</th>
+                            <th class="px-3 py-3 text-center">9Q</th>
+                            <th class="px-3 py-3 text-center">8Q</th>
+                            <th class="px-3 py-3">กลุ่มสี</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-table-body">
+                        <tr><td colspan="8" class="text-center py-8 text-gray-400">กำลังโหลดข้อมูล...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div><!-- end card -->
+
+    <!-- Modal รหัสผ่าน Admin -->
+    <div id="password-modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg p-6 max-w-sm w-full space-y-4 shadow-xl">
+            <h3 class="font-bold text-lg text-gray-800">🔒 เข้าสู่ระบบเจ้าหน้าที่</h3>
+            <p class="text-sm text-gray-500">กรอก username และ password เพื่อดูรายงานผลการประเมิน</p>
+            <div>
+                <label class="block text-sm text-gray-600 mb-1">Username</label>
+                <input type="text" id="admin-username" class="w-full px-3 py-2 border rounded text-sm" placeholder="กรอก username">
+            </div>
+            <div>
+                <label class="block text-sm text-gray-600 mb-1">Password</label>
+                <input type="password" id="admin-password" class="w-full px-3 py-2 border rounded text-sm" placeholder="กรอก password"
+                    onkeydown="if(event.key==='Enter') checkAdminPassword()">
+            </div>
+            <div id="login-error" class="hidden text-xs text-red-600 bg-red-50 px-3 py-2 rounded">ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง</div>
+            <div class="flex justify-end gap-2">
+                <button onclick="closeAdminModal()" class="px-4 py-2 bg-gray-200 rounded text-sm">ยกเลิก</button>
+                <button onclick="checkAdminPassword()" class="px-4 py-2 bg-red-600 text-white rounded text-sm font-semibold">เข้าสู่ระบบ</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // ============================================================
+    // ⚙️  ตั้งค่า API URL และ Admin Credentials
+    //     (แก้ไขส่วนนี้หลังจาก Deploy Google Apps Script แล้ว)
+    // ============================================================
+    const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbwhFXvBb-YxJtGnQ54wx-0FcNP3ymIDQv_q4xOCcyloslHrLULrho_vua87Sv_ktIbVvA/exec";
+
+    const ADMIN_ACCOUNTS = [
+        { username: "admin",    password: "admin1234@rph" },
+        { username: "nurse01",  password: "nurse2024" }
+        // เพิ่ม account ได้ที่นี่
+    ];
+    // ============================================================
+
+    // ข้อมูลแคช สำหรับ filter + export
+    let allAssessments = [];
+
+    // ==================== แบบประเมิน ====================
+    const q9List = [
+        "เบื่อ ไม่สนใจอยากทำอะไร",
+        "ไม่สบายใจ ซึมเศร้า ท้อแท้",
+        "หลับยาก หรือหลับๆ ตื่นๆ หรือหลับมากไป",
+        "เหนื่อยง่าย หรือไม่ค่อยมีแรง",
+        "เบื่ออาหาร หรือกินมากเกินไป",
+        "รู้สึกไม่ดีกับตัวเอง คิดว่าตัวเองล้มเหลว",
+        "สมาธิไม่ดีเวลาทำอะไร",
+        "พูดช้า ทำอะไรช้าลง หรือกระสับกระส่าย",
+        "คิดทำร้ายตนเอง หรือคิดว่า ถ้าตายไปคงจะดี"
+    ];
+    const q8List = [
+        { text: "คิดอยากตาย", w: 1 },
+        { text: "อยากทำร้ายตัวเอง", w: 2 },
+        { text: "คิดเกี่ยวกับการฆ่าตัวตาย", w: 6 },
+        { text: "มีแผนการที่จะฆ่าตัวตาย", w: 8 },
+        { text: "เตรียมการจะฆ่าตัวตายตั้งใจจะให้ตายจริงๆ", w: 9 },
+        { text: "ทำให้ตนเองบาดเจ็บแต่ไม่ตั้งใจให้ตาย", w: 4 },
+        { text: "พยายามฆ่าตัวตายตั้งใจให้ตาย", w: 10 },
+        { text: "ตลอดชีวิตเคยพยายามฆ่าตัวตาย", w: 4 }
+    ];
+
+    function renderQuestions() {
+        // 9Q
+        let html9q = '';
+        q9List.forEach((q, i) => {
+            html9q += `
+            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <p class="font-medium text-gray-800 text-sm mb-2">${i+1}. ${q}</p>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                    <label class="flex items-center gap-2 bg-white p-2 border rounded cursor-pointer hover:bg-gray-50"><input type="radio" name="q9_${i+1}" value="0" checked> ไม่มี (0)</label>
+                    <label class="flex items-center gap-2 bg-white p-2 border rounded cursor-pointer hover:bg-gray-50"><input type="radio" name="q9_${i+1}" value="1"> บางวัน (1)</label>
+                    <label class="flex items-center gap-2 bg-white p-2 border rounded cursor-pointer hover:bg-gray-50"><input type="radio" name="q9_${i+1}" value="2"> บ่อย (2)</label>
+                    <label class="flex items-center gap-2 bg-white p-2 border rounded cursor-pointer hover:bg-gray-50"><input type="radio" name="q9_${i+1}" value="3"> ทุกวัน (3)</label>
+                </div>
+            </div>`;
+        });
+        document.getElementById('questions-9q').innerHTML = html9q;
+
+        // 8Q
+        let html8q = '';
+        q8List.forEach((q, i) => {
+            html8q += `
+            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <p class="font-medium text-gray-800 text-sm">${i+1}. ${q.text}</p>
+                <div class="flex gap-4 text-xs shrink-0">
+                    <label class="flex items-center gap-2 bg-white px-4 py-2 border rounded cursor-pointer hover:bg-gray-50"><input type="radio" name="q8_${i+1}" value="0" checked> ไม่มี</label>
+                    <label class="flex items-center gap-2 bg-white px-4 py-2 border rounded cursor-pointer hover:bg-gray-50"><input type="radio" name="q8_${i+1}" value="${q.w}"> มี</label>
+                </div>
+            </div>`;
+        });
+        document.getElementById('questions-8q').innerHTML = html8q;
+    }
+    renderQuestions();
+
+    // ==================== Navigation ====================
+    function goToStep2() {
+        const name  = document.getElementById('fullname').value.trim();
+        const unit  = document.getElementById('unit').value.trim();
+        const job   = document.getElementById('job').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        if (!name || !unit || !job || !phone) {
+            alert("กรุณากรอกข้อมูลส่วนตัวให้ครบถ้วน");
+            return;
+        }
+        const rank = document.getElementById('rank').value.trim();
+        document.getElementById('review-name').innerText = rank ? `${rank} ${name}` : name;
+        document.getElementById('review-unit').innerText = unit;
+        document.getElementById('review-job').innerText  = job;
+        document.getElementById('step-1').classList.add('hidden');
+        document.getElementById('step-2').classList.remove('hidden');
+        window.scrollTo(0, 0);
+    }
+
+    function goToStep1() {
+        document.getElementById('step-2').classList.add('hidden');
+        document.getElementById('step-1').classList.remove('hidden');
+        window.scrollTo(0, 0);
+    }
+
+    // ==================== คำนวณและบันทึก ====================
+    function calculateAndSave() {
+        const btn = document.getElementById('btn-submit');
+        btn.disabled = true;
+        btn.innerText = "กำลังบันทึกข้อมูล...";
+
+        let total9Q = 0;
+        for (let i = 1; i <= 9; i++) total9Q += parseInt(document.querySelector(`input[name="q9_${i}"]:checked`).value);
+        let total8Q = 0;
+        for (let i = 1; i <= 8; i++) total8Q += parseInt(document.querySelector(`input[name="q8_${i}"]:checked`).value);
+
+        let colorStatus = "green";
+        if (total9Q >= 13 || total8Q >= 9) colorStatus = "red";
+        else if ((total9Q >= 7 && total9Q <= 12) || (total8Q >= 1 && total8Q <= 8)) colorStatus = "yellow";
+
+        const payload = {
+            rank:       document.getElementById('rank').value.trim(),
+            fullname:   document.getElementById('fullname').value.trim(),
+            unit:       document.getElementById('unit').value.trim(),
+            phone:      document.getElementById('phone').value.trim(),
+            job:        document.getElementById('job').value.trim(),
+            score9Q:    total9Q,
+            score8Q:    total8Q,
+            colorGroup: colorStatus
+        };
+
+        // แสดงผลทันที
+        showVisualResult(total9Q, total8Q, colorStatus);
+
+        // บันทึกเข้า Google Sheets ในเบื้องหลัง
+        if (SHEET_API_URL.includes("https://script.google.com/macros/s/AKfycbx52Fui1d5jSLYIF83Xx5culSQY5kouUCQs4gEyWdaXUw907f1j1DNNaijpHZyOlgh8CA/exec")) {
+            console.warn("⚠️ ยังไม่ได้ตั้งค่า SHEET_API_URL – ข้อมูลจะไม่ถูกบันทึก");
+            return;
+        }
+
+        fetch(SHEET_API_URL, {
+            method: "POST",
+            mode: "no-cors",          // Apps Script ต้องการ no-cors
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        }).catch(err => console.error("บันทึกไม่สำเร็จ:", err));
+    }
+
+    function showVisualResult(total9Q, total8Q, colorStatus) {
+        document.getElementById('step-2').classList.add('hidden');
+        document.getElementById('score-9q').innerText = total9Q;
+        document.getElementById('score-8q').innerText = total8Q;
+
+        const b9 = document.getElementById('badge-9q');
+        if (total9Q < 7)       { b9.innerText = "🟢 ปกติ";          b9.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-emerald-100 text-emerald-800"; }
+        else if (total9Q <= 12){ b9.innerText = "🟡 เฝ้าระวัง";     b9.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-yellow-100 text-yellow-800"; }
+        else                   { b9.innerText = "🔴 ซึมเศร้ารุนแรง"; b9.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-red-100 text-red-800"; }
+
+        const b8 = document.getElementById('badge-8q');
+        if (total8Q === 0)     { b8.innerText = "🟢 ไม่มีแนวโน้ม"; b8.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-emerald-100 text-emerald-800"; }
+        else if (total8Q <= 8) { b8.innerText = "🟡 เสี่ยงน้อย";    b8.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-yellow-100 text-yellow-800"; }
+        else                   { b8.innerText = "🔴 เสี่ยงรุนแรง";  b8.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-red-100 text-red-800"; }
+
+        const sec = document.getElementById('result-section');
+        const adv = document.getElementById('color-advice');
+        if (colorStatus === "green") {
+            sec.className = "mt-8 p-6 rounded-lg border-2 text-center space-y-4 bg-emerald-50 border-emerald-500 text-emerald-900";
+            adv.innerText = "✅ ข้อแนะนำ: สังเกตอาการตามปกติ";
+            adv.className = "text-sm font-semibold p-3 rounded max-w-md mx-auto mt-2 bg-emerald-100 text-emerald-800";
+        } else if (colorStatus === "yellow") {
+            sec.className = "mt-8 p-6 rounded-lg border-2 text-center space-y-4 bg-yellow-50 border-yellow-500 text-yellow-900";
+            adv.innerText = "⚠️ ข้อแนะนำ: กลุ่มเสี่ยงเฝ้าระวัง ให้การดูแลใกล้ชิด";
+            adv.className = "text-sm font-semibold p-3 rounded max-w-md mx-auto mt-2 bg-yellow-100 text-yellow-800";
+        } else {
+            sec.className = "mt-8 p-6 rounded-lg border-2 text-center space-y-4 bg-red-50 border-red-500 text-red-900";
+            adv.innerText = "🚨 ข้อแนะนำ: กลุ่มอันตราย ควรส่งพบจิตแพทย์ทันที";
+            adv.className = "text-sm font-semibold p-3 rounded max-w-md mx-auto mt-2 bg-red-100 text-red-800";
+        }
+        sec.classList.remove('hidden');
+    }
+
+    // ==================== Admin Login ====================
+    function openAdminModal() {
+        document.getElementById('password-modal').classList.remove('hidden');
+        document.getElementById('login-error').classList.add('hidden');
+        document.getElementById('admin-username').value = '';
+        document.getElementById('admin-password').value = '';
+        setTimeout(() => document.getElementById('admin-username').focus(), 100);
+    }
+
+    function closeAdminModal() {
+        document.getElementById('password-modal').classList.add('hidden');
+    }
+
+    function checkAdminPassword() {
+        const u = document.getElementById('admin-username').value.trim();
+        const p = document.getElementById('admin-password').value;
+        const match = ADMIN_ACCOUNTS.find(a => a.username === u && a.password === p);
+        if (match) {
+            closeAdminModal();
+            document.getElementById('step-1').classList.add('hidden');
+            document.getElementById('step-2').classList.add('hidden');
+            document.getElementById('result-section').classList.add('hidden');
+            document.getElementById('admin-section').classList.remove('hidden');
+            loadAdminData();
+        } else {
+            document.getElementById('login-error').classList.remove('hidden');
+        }
+    }
+
+    function closeAdmin() {
+        document.getElementById('admin-section').classList.add('hidden');
+        document.getElementById('step-1').classList.remove('hidden');
+    }
+
+    // ==================== Admin: โหลดข้อมูลจาก Google Sheets ====================
+    function loadAdminData() {
+        const tbody = document.getElementById('admin-table-body');
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-gray-400">⏳ กำลังโหลดข้อมูลจาก Google Sheets...</td></tr>';
+
+        if (SHEET_API_URL.includes("https://script.google.com/macros/s/AKfycbx52Fui1d5jSLYIF83Xx5culSQY5kouUCQs4gEyWdaXUw907f1j1DNNaijpHZyOlgh8CA/exec")) {
+            tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-yellow-600">
+                ⚠️ ยังไม่ได้ตั้งค่า SHEET_API_URL<br>
+                <span class="text-xs text-gray-400">กรุณา deploy Google Apps Script แล้วนำ URL มาวางในไฟล์ HTML</span>
+            </td></tr>`;
+            return;
+        }
+
+        fetch(SHEET_API_URL)
+            .then(res => res.json())
+            .then(result => {
+                if (!result.success) throw new Error(result.error || "เกิดข้อผิดพลาด");
+                renderAdminTable(result.data);
+            })
+            .catch(err => {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-red-500">
+                    ❌ โหลดข้อมูลไม่สำเร็จ: ${err.message}
+                </td></tr>`;
+            });
+    }
+
+    function renderAdminTable(data) {
+        allAssessments = data.reverse(); // เรียงล่าสุดก่อน
+        updateStats(allAssessments);
+        renderRows(allAssessments);
+        document.getElementById('admin-summary').classList.remove('hidden');
+    }
+
+    function updateStats(data) {
+        const green  = data.filter(r => r.colorGroup && r.colorGroup.includes('เขียว')).length;
+        const yellow = data.filter(r => r.colorGroup && r.colorGroup.includes('เหลือง')).length;
+        const red    = data.filter(r => r.colorGroup && r.colorGroup.includes('แดง')).length;
+        document.getElementById('stat-total').innerText  = data.length;
+        document.getElementById('stat-green').innerText  = green;
+        document.getElementById('stat-yellow').innerText = yellow;
+        document.getElementById('stat-red').innerText    = red;
+    }
+
+    function renderRows(data) {
+        const tbody = document.getElementById('admin-table-body');
+        if (data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-gray-400">ไม่พบข้อมูล</td></tr>';
+            return;
+        }
+        tbody.innerHTML = data.map(row => {
+            const isRed    = row.colorGroup && row.colorGroup.includes('แดง');
+            const isYellow = row.colorGroup && row.colorGroup.includes('เหลือง');
+            const rowCls   = isRed ? 'bg-red-50 text-red-900' : isYellow ? 'bg-yellow-50 text-yellow-900' : 'bg-white';
+            const badge    = isRed
+                ? '<span class="px-2 py-1 rounded text-xs font-bold bg-red-100 text-red-800">🔴 สีแดง</span>'
+                : isYellow
+                ? '<span class="px-2 py-1 rounded text-xs font-bold bg-yellow-100 text-yellow-800">🟡 สีเหลือง</span>'
+                : '<span class="px-2 py-1 rounded text-xs font-bold bg-emerald-100 text-emerald-800">🟢 สีเขียว</span>';
+            return `
+            <tr class="${rowCls} border-b hover:brightness-95 transition">
+                <td class="px-3 py-3 text-xs">${row.timestamp || '-'}</td>
+                <td class="px-3 py-3">${row.rank || ''} ${row.fullname || ''}</td>
+                <td class="px-3 py-3">${row.unit || '-'}</td>
+                <td class="px-3 py-3">${row.phone || '-'}</td>
+                <td class="px-3 py-3">${row.job || '-'}</td>
+                <td class="px-3 py-3 font-bold text-center">${row.score9Q ?? '-'}</td>
+                <td class="px-3 py-3 font-bold text-center">${row.score8Q ?? '-'}</td>
+                <td class="px-3 py-3">${badge}</td>
+            </tr>`;
+        }).join('');
+    }
+
+    // ==================== Filter ====================
+    function filterTable() {
+        const colorFilter  = document.getElementById('filter-color').value.toLowerCase();
+        const searchFilter = document.getElementById('filter-search').value.toLowerCase();
+
+        const filtered = allAssessments.filter(row => {
+            const matchColor  = !colorFilter || (row.colorGroup && row.colorGroup.toLowerCase().includes(colorFilter));
+            const matchSearch = !searchFilter ||
+                (row.fullname && row.fullname.toLowerCase().includes(searchFilter)) ||
+                (row.unit     && row.unit.toLowerCase().includes(searchFilter));
+            return matchColor && matchSearch;
+        });
+        renderRows(filtered);
+    }
+
+    // ==================== Export Excel ====================
+    function exportToExcel() {
+        if (allAssessments.length === 0) {
+            alert("ยังไม่มีข้อมูลสำหรับ Export");
+            return;
+        }
+        const exportData = allAssessments.map(r => ({
+            'วัน-เวลาที่ทำ':              r.timestamp || '',
+            'ยศ/คำนำหน้า':                r.rank || '',
+            'ชื่อ-สกุล':                  r.fullname || '',
+            'หน่วยงาน/สังกัด':            r.unit || '',
+            'เบอร์โทร':                   r.phone || '',
+            'ตำแหน่งงาน':                 r.job || '',
+            'คะแนน 9Q (ซึมเศร้า)':        r.score9Q ?? '',
+            'คะแนน 8Q (แนวโน้มฆ่าตัวตาย)': r.score8Q ?? '',
+            'กลุ่มสี':                    r.colorGroup || ''
+        }));
+
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(exportData);
+        ws['!cols'] = [
+            { wch: 20 }, { wch: 12 }, { wch: 22 }, { wch: 20 },
+            { wch: 14 }, { wch: 24 }, { wch: 18 }, { wch: 22 }, { wch: 18 }
+        ];
+        XLSX.utils.book_append_sheet(wb, ws, "ผลการประเมิน");
+
+        // Sheet สรุป
+        const total  = allAssessments.length;
+        const green  = allAssessments.filter(r => r.colorGroup && r.colorGroup.includes('เขียว')).length;
+        const yellow = allAssessments.filter(r => r.colorGroup && r.colorGroup.includes('เหลือง')).length;
+        const red    = allAssessments.filter(r => r.colorGroup && r.colorGroup.includes('แดง')).length;
+        const ws2 = XLSX.utils.json_to_sheet([
+            { รายการ: 'ผู้เข้าประเมินทั้งหมด',             'จำนวน (คน)': total },
+            { รายการ: 'กลุ่มสีเขียว (ปกติ)',               'จำนวน (คน)': green },
+            { รายการ: 'กลุ่มสีเหลือง (เฝ้าระวัง)',         'จำนวน (คน)': yellow },
+            { รายการ: 'กลุ่มสีแดง (อันตราย/ส่งพบแพทย์)',  'จำนวน (คน)': red },
+        ]);
+        ws2['!cols'] = [{ wch: 36 }, { wch: 16 }];
+        XLSX.utils.book_append_sheet(wb, ws2, "สรุปสถิติ");
+
+        const now = new Date();
+        const tag = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+        XLSX.writeFile(wb, `ผลประเมินสุขภาพจิต_${tag}.xlsx`);
+    }
+    </script>
+</body>
+</html>
