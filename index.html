@@ -138,7 +138,7 @@
             </div>
         </div>
 
-        <!-- Admin Dashboard -->
+        <!--  Dashboard -->
         <div id="admin-section" class="hidden space-y-6">
             <div class="flex justify-between items-center border-b pb-4 flex-wrap gap-2">
                 <h2 class="text-xl font-bold text-gray-800">📊 รายงานผลการประเมิน (เจ้าหน้าที่)</h2>
@@ -491,30 +491,83 @@
     }
 
     // ==================== Admin: โหลดข้อมูลจาก Google Sheets ====================
-    function loadAdminData() {
-        const tbody = document.getElementById('admin-table-body');
-        tbody.innerHTML = '<tr><td colspan="11" class="text-center py-8 text-gray-400">⏳ กำลังโหลดข้อมูลจาก Google Sheets...</td></tr>';
+   function loadAdminData() {
 
-        if (SHEET_API_URL.includes("https://script.google.com/macros/s/AKfycbx52Fui1d5jSLYIF83Xx5culSQY5kouUCQs4gEyWdaXUw907f1j1DNNaijpHZyOlgh8CA/exec")) {
-            tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-yellow-600">
-                ⚠️ ยังไม่ได้ตั้งค่า SHEET_API_URL<br>
-                <span class="text-xs text-gray-400">กรุณา deploy Google Apps Script แล้วนำ URL มาวางในไฟล์ HTML</span>
-            </td></tr>`;
-            return;
-        }
+  const tbody = document.getElementById('admin-table-body');
 
-        fetch(SHEET_API_URL)
-            .then(res => res.json())
-            .then(result => {
-                if (!result.success) throw new Error(result.error || "เกิดข้อผิดพลาด");
-                renderAdminTable(result.data);
-            })
-            .catch(err => {
-                tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-red-500">
-                    ❌ โหลดข้อมูลไม่สำเร็จ: ${err.message}
-                </td></tr>`;
-            });
+  tbody.innerHTML =
+    '<tr><td colspan="12" class="text-center py-8 text-gray-400">' +
+    '⏳ กำลังโหลดข้อมูลจาก Google Sheets...</td></tr>';
+
+
+  // ชื่อ callback ไม่ให้ซ้ำกัน
+  const callbackName =
+    "gasCallback_" + Date.now();
+
+
+  // ฟังก์ชันรับข้อมูลจาก Apps Script
+  window[callbackName] = function(result) {
+
+    try {
+
+      if (!result.success) {
+        throw new Error(
+          result.error || "เกิดข้อผิดพลาด"
+        );
+      }
+
+      renderAdminTable(result.data || []);
+
+    } catch (err) {
+
+      tbody.innerHTML =
+        `<tr>
+          <td colspan="12"
+              class="text-center py-8 text-red-500">
+            ❌ โหลดข้อมูลไม่สำเร็จ:
+            ${err.message}
+          </td>
+        </tr>`;
+
+    } finally {
+
+      delete window[callbackName];
+
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+
     }
+  };
+
+
+  // เรียก Apps Script ด้วย JSONP
+  const script = document.createElement("script");
+
+  script.src =
+    SHEET_API_URL +
+    "?callback=" +
+    callbackName +
+    "&t=" +
+    Date.now();
+
+
+  script.onerror = function() {
+
+    tbody.innerHTML =
+      `<tr>
+        <td colspan="12"
+            class="text-center py-8 text-red-500">
+          ❌ เชื่อมต่อ Google Apps Script ไม่สำเร็จ
+        </td>
+      </tr>`;
+
+    delete window[callbackName];
+  };
+
+
+  document.body.appendChild(script);
+}
 
     function renderAdminTable(data) {
         allAssessments = data.reverse(); // เรียงล่าสุดก่อน
