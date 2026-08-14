@@ -77,6 +77,40 @@
                 <div class="space-y-4 mt-4" id="questions-8q"></div>
             </div>
 
+            <hr class="border-gray-300">
+
+            <div>
+                <h2 class="text-lg font-semibold text-gray-800 bg-gray-200 p-2 rounded">ส่วนที่ 3: ปัจจัย/ปัญหาที่ส่งผลกระทบต่อการดำเนินชีวิต</h2>
+                <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 mt-4 space-y-3">
+                    <p class="font-medium text-gray-800 text-sm mb-2">ในปัจจุบัน ท่านมีปัจจัยหรือปัญหาใดที่ส่งผลกระทบต่อการดำเนินชีวิตอย่างรุนแรง จนอาจทำให้รู้สึกไม่สามารถรับมือหรือดำเนินชีวิตต่อไปได้ (เลือกได้มากกว่า 1 ข้อ)</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm" id="risk-factor-options">
+                        <label class="flex items-center gap-2 bg-white p-2 border rounded cursor-pointer hover:bg-gray-50">
+                            <input type="checkbox" name="risk_factor" value="หนี้สินของตนเอง" class="risk-checkbox"> หนี้สินของตนเอง
+                        </label>
+                        <label class="flex items-center gap-2 bg-white p-2 border rounded cursor-pointer hover:bg-gray-50">
+                            <input type="checkbox" name="risk_factor" value="หนี้สินหรือภาระทางการเงินของผู้อื่นที่ต้องรับผิดชอบ" class="risk-checkbox"> หนี้สินหรือภาระทางการเงินของผู้อื่นที่ต้องรับผิดชอบ
+                        </label>
+                        <label class="flex items-center gap-2 bg-white p-2 border rounded cursor-pointer hover:bg-gray-50">
+                            <input type="checkbox" name="risk_factor" value="ปัญหาครอบครัว/ความสัมพันธ์" class="risk-checkbox"> ปัญหาครอบครัว/ความสัมพันธ์
+                        </label>
+                        <label class="flex items-center gap-2 bg-white p-2 border rounded cursor-pointer hover:bg-gray-50">
+                            <input type="checkbox" name="risk_factor" value="ภาระงานหรือปัญหาจากการทำงาน" class="risk-checkbox"> ภาระงานหรือปัญหาจากการทำงาน
+                        </label>
+                        <label class="flex items-center gap-2 bg-white p-2 border rounded cursor-pointer hover:bg-gray-50">
+                            <input type="checkbox" name="risk_factor" value="โรคประจำตัว/ปัญหาสุขภาพ" class="risk-checkbox"> โรคประจำตัว/ปัญหาสุขภาพ
+                        </label>
+                        <label class="flex items-center gap-2 bg-white p-2 border rounded cursor-pointer hover:bg-gray-50">
+                            <input type="checkbox" id="risk-other-check" name="risk_factor" value="อื่นๆ" class="risk-checkbox"> อื่น ๆ โปรดระบุ
+                        </label>
+                        <label class="flex items-center gap-2 bg-white p-2 border rounded cursor-pointer hover:bg-gray-50 sm:col-span-2">
+                            <input type="checkbox" id="risk-none-check" name="risk_factor" value="ไม่มี" class="risk-checkbox"> ไม่มี
+                        </label>
+                    </div>
+                    <input type="text" id="risk-other-text" placeholder="โปรดระบุรายละเอียด..." disabled
+                        class="w-full px-3 py-2 border rounded-md text-sm outline-none focus:ring-2 focus:ring-red-400 bg-gray-100 disabled:opacity-60">
+                </div>
+            </div>
+
             <div class="flex justify-between items-center pt-4">
                 <button onclick="goToStep1()" class="text-gray-600 hover:underline font-medium">← ย้อนกลับ</button>
                 <button onclick="calculateAndSave()" id="btn-submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-3 rounded-md shadow-lg">ส่งข้อมูลและดูผลลัพธ์</button>
@@ -110,6 +144,8 @@
                 <h2 class="text-xl font-bold text-gray-800">📊 รายงานผลการประเมิน (เจ้าหน้าที่)</h2>
                 <div class="flex gap-2 flex-wrap">
                     <button onclick="loadAdminData()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm font-semibold">🔄 รีเฟรชข้อมูล</button>
+                    <button onclick="selectDuplicates()" class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded text-sm font-semibold">🔁 เลือกรายการที่ทำซ้ำ</button>
+                    <button onclick="deleteSelectedRows()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm font-semibold">🗑 ลบรายการที่เลือก</button>
                     <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded text-sm font-semibold">⬇ Export Excel</button>
                     <button onclick="closeAdmin()" class="bg-gray-500 text-white px-3 py-1 rounded text-sm">กลับหน้าหลัก</button>
                 </div>
@@ -152,6 +188,7 @@
                 <table class="w-full text-sm text-left text-gray-600 border">
                     <thead class="text-xs text-white uppercase bg-red-700">
                         <tr>
+                            <th class="px-3 py-3"><input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAll(this)"></th>
                             <th class="px-3 py-3">วัน-เวลาที่ทำ</th>
                             <th class="px-3 py-3">ยศ-ชื่อ-สกุล</th>
                             <th class="px-3 py-3">หน่วยงาน/สังกัด</th>
@@ -160,10 +197,13 @@
                             <th class="px-3 py-3 text-center">9Q</th>
                             <th class="px-3 py-3 text-center">8Q</th>
                             <th class="px-3 py-3">กลุ่มสี</th>
+                            <th class="px-3 py-3">ปัจจัยเสี่ยง</th>
+                            <th class="px-3 py-3 text-center">ซ้ำ?</th>
+                            <th class="px-3 py-3 text-center">จัดการ</th>
                         </tr>
                     </thead>
                     <tbody id="admin-table-body">
-                        <tr><td colspan="8" class="text-center py-8 text-gray-400">กำลังโหลดข้อมูล...</td></tr>
+                        <tr><td colspan="11" class="text-center py-8 text-gray-400">กำลังโหลดข้อมูล...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -266,6 +306,31 @@
     }
     renderQuestions();
 
+    // ==================== ส่วนที่ 3: ปัจจัยเสี่ยง ====================
+    document.addEventListener('change', function(e) {
+        if (!e.target.classList || !e.target.classList.contains('risk-checkbox')) return;
+
+        const otherCheck = document.getElementById('risk-other-check');
+        const noneCheck  = document.getElementById('risk-none-check');
+        const otherText  = document.getElementById('risk-other-text');
+        const allBoxes   = document.querySelectorAll('.risk-checkbox');
+
+        // เปิด/ปิดช่องกรอกข้อความ "อื่นๆ"
+        otherText.disabled = !otherCheck.checked;
+        if (!otherCheck.checked) otherText.value = '';
+
+        // ถ้าเลือก "ไม่มี" ให้ยกเลิกตัวเลือกอื่นทั้งหมด
+        if (e.target === noneCheck && noneCheck.checked) {
+            allBoxes.forEach(cb => { if (cb !== noneCheck) cb.checked = false; });
+            otherText.disabled = true;
+            otherText.value = '';
+        }
+        // ถ้าเลือกตัวเลือกอื่นใด ให้ยกเลิก "ไม่มี"
+        else if (e.target !== noneCheck && e.target.checked) {
+            noneCheck.checked = false;
+        }
+    });
+
     // ==================== Navigation ====================
     function goToStep2() {
         const name  = document.getElementById('fullname').value.trim();
@@ -293,6 +358,20 @@
 
     // ==================== คำนวณและบันทึก ====================
     function calculateAndSave() {
+        // ตรวจสอบส่วนที่ 3: ถ้าเลือก "อื่นๆ" ต้องระบุรายละเอียด
+        const otherCheck = document.getElementById('risk-other-check');
+        const otherText  = document.getElementById('risk-other-text');
+        if (otherCheck.checked && !otherText.value.trim()) {
+            alert("กรุณาระบุรายละเอียดปัจจัย/ปัญหาอื่น ๆ ในส่วนที่ 3");
+            otherText.focus();
+            return;
+        }
+        const anyRiskChecked = document.querySelectorAll('.risk-checkbox:checked').length > 0;
+        if (!anyRiskChecked) {
+            alert("กรุณาเลือกอย่างน้อย 1 ข้อในส่วนที่ 3 (หากไม่มี ให้เลือก \"ไม่มี\")");
+            return;
+        }
+
         const btn = document.getElementById('btn-submit');
         btn.disabled = true;
         btn.innerText = "กำลังบันทึกข้อมูล...";
@@ -306,7 +385,16 @@
         if (total9Q >= 13 || total8Q >= 9) colorStatus = "red";
         else if ((total9Q >= 7 && total9Q <= 12) || (total8Q >= 1 && total8Q <= 8)) colorStatus = "yellow";
 
+        // รวบรวมปัจจัยเสี่ยงที่เลือกในส่วนที่ 3
+        let riskFactors = Array.from(document.querySelectorAll('.risk-checkbox:checked')).map(cb => cb.value);
+        riskFactors = riskFactors.map(v => v === "อื่นๆ" ? `อื่นๆ: ${otherText.value.trim()}` : v);
+        const riskFactorsText = riskFactors.join(", ");
+
+        // สร้างรหัสอ้างอิงเฉพาะรายการนี้ ใช้สำหรับลบข้อมูลภายหลัง
+        const clientId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
         const payload = {
+            clientId:   clientId,
             rank:       document.getElementById('rank').value.trim(),
             fullname:   document.getElementById('fullname').value.trim(),
             unit:       document.getElementById('unit').value.trim(),
@@ -314,7 +402,8 @@
             job:        document.getElementById('job').value.trim(),
             score9Q:    total9Q,
             score8Q:    total8Q,
-            colorGroup: colorStatus
+            colorGroup: colorStatus,
+            riskFactors: riskFactorsText
         };
 
         // แสดงผลทันที
@@ -404,10 +493,10 @@
     // ==================== Admin: โหลดข้อมูลจาก Google Sheets ====================
     function loadAdminData() {
         const tbody = document.getElementById('admin-table-body');
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-gray-400">⏳ กำลังโหลดข้อมูลจาก Google Sheets...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11" class="text-center py-8 text-gray-400">⏳ กำลังโหลดข้อมูลจาก Google Sheets...</td></tr>';
 
         if (SHEET_API_URL.includes("https://script.google.com/macros/s/AKfycbx52Fui1d5jSLYIF83Xx5culSQY5kouUCQs4gEyWdaXUw907f1j1DNNaijpHZyOlgh8CA/exec")) {
-            tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-yellow-600">
+            tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-yellow-600">
                 ⚠️ ยังไม่ได้ตั้งค่า SHEET_API_URL<br>
                 <span class="text-xs text-gray-400">กรุณา deploy Google Apps Script แล้วนำ URL มาวางในไฟล์ HTML</span>
             </td></tr>`;
@@ -421,7 +510,7 @@
                 renderAdminTable(result.data);
             })
             .catch(err => {
-                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-red-500">
+                tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-red-500">
                     ❌ โหลดข้อมูลไม่สำเร็จ: ${err.message}
                 </td></tr>`;
             });
@@ -444,12 +533,28 @@
         document.getElementById('stat-red').innerText    = red;
     }
 
+    // คืนค่ารหัสอ้างอิงเฉพาะแถว ใช้จับคู่ตอนลบ (ใช้ clientId ถ้ามี ไม่งั้น fallback เป็น timestamp+เบอร์โทร)
+    function getRowKey(row) {
+        return row.clientId || `${row.timestamp || ''}|${row.phone || ''}|${row.fullname || ''}`;
+    }
+
+    // หาชื่อ+หน่วยงานที่ทำแบบประเมินซ้ำมากกว่า 1 ครั้ง
+    function findDuplicateKeys(data) {
+        const nameKey = r => `${(r.fullname || '').trim()}|${(r.unit || '').trim()}`.toLowerCase();
+        const counts = {};
+        data.forEach(r => { const k = nameKey(r); counts[k] = (counts[k] || 0) + 1; });
+        return counts;
+    }
+
     function renderRows(data) {
         const tbody = document.getElementById('admin-table-body');
         if (data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-gray-400">ไม่พบข้อมูล</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="11" class="text-center py-8 text-gray-400">ไม่พบข้อมูล</td></tr>';
             return;
         }
+        const dupCounts = findDuplicateKeys(data);
+        const nameKey = r => `${(r.fullname || '').trim()}|${(r.unit || '').trim()}`.toLowerCase();
+
         tbody.innerHTML = data.map(row => {
             const isRed    = row.colorGroup && row.colorGroup.includes('แดง');
             const isYellow = row.colorGroup && row.colorGroup.includes('เหลือง');
@@ -459,8 +564,13 @@
                 : isYellow
                 ? '<span class="px-2 py-1 rounded text-xs font-bold bg-yellow-100 text-yellow-800">🟡 สีเหลือง</span>'
                 : '<span class="px-2 py-1 rounded text-xs font-bold bg-emerald-100 text-emerald-800">🟢 สีเขียว</span>';
+            const isDup    = (dupCounts[nameKey(row)] || 0) > 1;
+            const dupBadge = isDup ? '<span class="px-2 py-1 rounded text-xs font-bold bg-orange-100 text-orange-700">ซ้ำ</span>' : '';
+            const rowKey   = getRowKey(row).replace(/"/g, '&quot;');
+
             return `
             <tr class="${rowCls} border-b hover:brightness-95 transition">
+                <td class="px-3 py-3"><input type="checkbox" class="row-checkbox" data-key="${rowKey}"></td>
                 <td class="px-3 py-3 text-xs">${row.timestamp || '-'}</td>
                 <td class="px-3 py-3">${row.rank || ''} ${row.fullname || ''}</td>
                 <td class="px-3 py-3">${row.unit || '-'}</td>
@@ -469,8 +579,79 @@
                 <td class="px-3 py-3 font-bold text-center">${row.score9Q ?? '-'}</td>
                 <td class="px-3 py-3 font-bold text-center">${row.score8Q ?? '-'}</td>
                 <td class="px-3 py-3">${badge}</td>
+                <td class="px-3 py-3 text-xs max-w-[180px]">${row.riskFactors || '-'}</td>
+                <td class="px-3 py-3 text-center">${dupBadge}</td>
+                <td class="px-3 py-3 text-center">
+                    <button onclick="deleteSingleRow('${rowKey}')" class="text-red-600 hover:text-red-800 text-xs font-semibold underline">ลบ</button>
+                </td>
             </tr>`;
         }).join('');
+    }
+
+    // ==================== เลือก / ลบข้อมูล ====================
+    function toggleSelectAll(checkbox) {
+        document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = checkbox.checked);
+    }
+
+    function selectDuplicates() {
+        const dupCounts = findDuplicateKeys(allAssessments);
+        const nameKey = r => `${(r.fullname || '').trim()}|${(r.unit || '').trim()}`.toLowerCase();
+        // เก็บรายการที่ทำซ้ำ โดยจะ "เว้น" รายการล่าสุด (แถวแรกในลิสต์ เพราะเรียงล่าสุดก่อน) ไว้ ไม่เลือกลบ
+        const seen = {};
+        document.querySelectorAll('.row-checkbox').forEach(cb => {
+            const key = cb.dataset.key;
+            const row = allAssessments.find(r => getRowKey(r) === key);
+            if (!row) { cb.checked = false; return; }
+            const nk = nameKey(row);
+            const isDup = (dupCounts[nk] || 0) > 1;
+            if (!isDup) { cb.checked = false; return; }
+            if (!seen[nk]) { seen[nk] = true; cb.checked = false; } // เก็บรายการแรก (ล่าสุด) ไว้
+            else { cb.checked = true; }
+        });
+        alert("เลือกรายการที่ทำแบบประเมินซ้ำแล้ว (เก็บรายการล่าสุดของแต่ละคนไว้) กรุณาตรวจสอบก่อนกดลบ");
+    }
+
+    function getSelectedKeys() {
+        return Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.dataset.key);
+    }
+
+    function deleteSingleRow(key) {
+        if (!confirm("ยืนยันการลบข้อมูลรายการนี้? การลบไม่สามารถย้อนกลับได้")) return;
+        sendDeleteRequest([key]);
+    }
+
+    function deleteSelectedRows() {
+        const keys = getSelectedKeys();
+        if (keys.length === 0) {
+            alert("กรุณาเลือกรายการที่ต้องการลบก่อน");
+            return;
+        }
+        if (!confirm(`ยืนยันการลบข้อมูลที่เลือกไว้ ${keys.length} รายการ? การลบไม่สามารถย้อนกลับได้`)) return;
+        sendDeleteRequest(keys);
+    }
+
+    function sendDeleteRequest(keys) {
+        if (SHEET_API_URL.includes("https://script.google.com/macros/s/AKfycbx52Fui1d5jSLYIF83Xx5culSQY5kouUCQs4gEyWdaXUw907f1j1DNNaijpHZyOlgh8CA/exec")) {
+            alert("⚠️ ยังไม่ได้ตั้งค่า SHEET_API_URL จึงไม่สามารถลบข้อมูลได้");
+            return;
+        }
+        // อัปเดตหน้าจอทันที (optimistic update)
+        allAssessments = allAssessments.filter(r => !keys.includes(getRowKey(r)));
+        updateStats(allAssessments);
+        renderRows(allAssessments);
+
+        // ระบุรายละเอียดของแต่ละรายการที่จะลบ (เผื่อฝั่ง Apps Script ต้องจับคู่ด้วย timestamp/เบอร์โทร)
+        const rows = keys.map(k => {
+            const [timestamp, phone, fullname] = k.split('|');
+            return { clientId: k, timestamp, phone, fullname };
+        });
+
+        fetch(SHEET_API_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "delete", keys: keys, rows: rows })
+        }).catch(err => console.error("ลบข้อมูลไม่สำเร็จ:", err));
     }
 
     // ==================== Filter ====================
@@ -503,14 +684,15 @@
             'ตำแหน่งงาน':                 r.job || '',
             'คะแนน 9Q (ซึมเศร้า)':        r.score9Q ?? '',
             'คะแนน 8Q (แนวโน้มฆ่าตัวตาย)': r.score8Q ?? '',
-            'กลุ่มสี':                    r.colorGroup || ''
+            'กลุ่มสี':                    r.colorGroup || '',
+            'ปัจจัย/ปัญหาที่ส่งผลกระทบ':   r.riskFactors || ''
         }));
 
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.json_to_sheet(exportData);
         ws['!cols'] = [
             { wch: 20 }, { wch: 12 }, { wch: 22 }, { wch: 20 },
-            { wch: 14 }, { wch: 24 }, { wch: 18 }, { wch: 22 }, { wch: 18 }
+            { wch: 14 }, { wch: 24 }, { wch: 18 }, { wch: 22 }, { wch: 18 }, { wch: 40 }
         ];
         XLSX.utils.book_append_sheet(wb, ws, "ผลการประเมิน");
 
