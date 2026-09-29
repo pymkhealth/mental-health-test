@@ -66,14 +66,31 @@
             </div>
 
             <div>
-                <h2 class="text-lg font-semibold text-gray-800 bg-gray-200 p-2 rounded">ส่วนที่ 1: แบบประเมินภาวะซึมเศร้า 9 คำถาม (9Q)</h2>
-                <div class="space-y-4 mt-4" id="questions-9q"></div>
+                <h2 class="text-lg font-semibold text-gray-800 bg-gray-200 p-2 rounded">ส่วนที่ 1: แบบประเมินความเครียด 5 ข้อ (ST-5)</h2>
+                <p class="text-sm text-gray-600 mt-2">ประเมินอาการหรือความรู้สึกที่เกิดขึ้นในช่วง 2–4 สัปดาห์ที่ผ่านมา</p>
+                <div class="space-y-4 mt-4" id="questions-st5"></div>
             </div>
 
             <hr class="border-gray-300">
 
             <div>
-                <h2 class="text-lg font-semibold text-gray-800 bg-gray-200 p-2 rounded">ส่วนที่ 2: แบบประเมินการฆ่าตัวตาย 8 คำถาม (8Q)</h2>
+                <h2 class="text-lg font-semibold text-gray-800 bg-gray-200 p-2 rounded">ส่วนที่ 2: แบบคัดกรองโรคซึมเศร้า 2 คำถาม (2Q)</h2>
+                <p class="text-sm text-gray-600 mt-2">หากตอบ “มี” อย่างน้อย 1 ข้อ ระบบจะให้ทำ 9Q และ 8Q ต่อ</p>
+                <div class="space-y-4 mt-4" id="questions-2q"></div>
+                <div id="result-2q-inline" class="hidden mt-4 p-3 rounded-lg text-sm font-semibold"></div>
+            </div>
+
+            <hr class="border-gray-300">
+
+            <div id="section-9q" class="hidden">
+                <h2 class="text-lg font-semibold text-gray-800 bg-gray-200 p-2 rounded">ส่วนที่ 3: แบบประเมินภาวะซึมเศร้า 9 คำถาม (9Q)</h2>
+                <div class="space-y-4 mt-4" id="questions-9q"></div>
+            </div>
+
+            <hr class="border-gray-300">
+
+            <div id="section-8q" class="hidden">
+                <h2 class="text-lg font-semibold text-gray-800 bg-gray-200 p-2 rounded">ส่วนที่ 4: แบบประเมินการฆ่าตัวตาย 8 คำถาม (8Q)</h2>
                 <div class="space-y-4 mt-4" id="questions-8q"></div>
             </div>
 
@@ -120,15 +137,25 @@
         <!-- ผลลัพธ์ -->
         <div id="result-section" class="hidden mt-8 p-6 rounded-lg border-2 text-center space-y-4">
             <h2 class="text-2xl font-bold">บันทึกข้อมูลสำเร็จ ผลการประเมินของคุณคือ</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left max-w-md mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left max-w-3xl mx-auto">
+                <div class="p-4 bg-white rounded shadow border">
+                    <p class="text-sm text-gray-500">คะแนนความเครียด (ST-5)</p>
+                    <p class="text-xl font-bold mt-1"><span id="score-st5">0</span> คะแนน</p>
+                    <div id="badge-st5" class="inline-block px-3 py-1 text-xs font-bold rounded-full mt-2"></div>
+                </div>
+                <div class="p-4 bg-white rounded shadow border">
+                    <p class="text-sm text-gray-500">ผลคัดกรองซึมเศร้า (2Q)</p>
+                    <p class="text-xl font-bold mt-1"><span id="score-2q">0</span> คะแนน</p>
+                    <div id="badge-2q" class="inline-block px-3 py-1 text-xs font-bold rounded-full mt-2"></div>
+                </div>
                 <div class="p-4 bg-white rounded shadow border">
                     <p class="text-sm text-gray-500">คะแนนภาวะซึมเศร้า (9Q)</p>
-                    <p class="text-xl font-bold mt-1"><span id="score-9q">0</span> คะแนน</p>
+                    <p class="text-xl font-bold mt-1"><span id="score-9q">-</span> คะแนน</p>
                     <div id="badge-9q" class="inline-block px-3 py-1 text-xs font-bold rounded-full mt-2"></div>
                 </div>
                 <div class="p-4 bg-white rounded shadow border">
                     <p class="text-sm text-gray-500">คะแนนแนวโน้มฆ่าตัวตาย (8Q)</p>
-                    <p class="text-xl font-bold mt-1"><span id="score-8q">0</span> คะแนน</p>
+                    <p class="text-xl font-bold mt-1"><span id="score-8q">-</span> คะแนน</p>
                     <div id="badge-8q" class="inline-block px-3 py-1 text-xs font-bold rounded-full mt-2"></div>
                 </div>
             </div>
@@ -198,6 +225,8 @@
                             <th class="px-3 py-3">หน่วยงาน/สังกัด</th>
                             <th class="px-3 py-3">เบอร์โทร</th>
                             <th class="px-3 py-3">ตำแหน่ง</th>
+                            <th class="px-3 py-3 text-center">ST-5</th>
+                            <th class="px-3 py-3 text-center">2Q</th>
                             <th class="px-3 py-3 text-center">9Q</th>
                             <th class="px-3 py-3 text-center">8Q</th>
                             <th class="px-3 py-3">กลุ่มสี</th>
@@ -207,7 +236,7 @@
                         </tr>
                     </thead>
                     <tbody id="admin-table-body">
-                        <tr><td colspan="11" class="text-center py-8 text-gray-400">กำลังโหลดข้อมูล...</td></tr>
+                        <tr><td colspan="13" class="text-center py-8 text-gray-400">กำลังโหลดข้อมูล...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -255,6 +284,19 @@
     let allAssessments = [];
 
     // ==================== แบบประเมิน ====================
+    const st5List = [
+        "มีปัญหาการนอน นอนไม่หลับ หรือนอนมาก",
+        "มีสมาธิน้อยลง",
+        "หงุดหงิด / กระวนกระวาย / ว้าวุ่นใจ",
+        "รู้สึกเบื่อ เซ็ง",
+        "ไม่อยากพบปะผู้คน"
+    ];
+
+    const q2List = [
+        "ใน 2 สัปดาห์ที่ผ่านมา รวมทั้งวันนี้ ท่านรู้สึกหดหู่ เศร้า หรือท้อแท้สิ้นหวังหรือไม่",
+        "ใน 2 สัปดาห์ที่ผ่านมา รวมทั้งวันนี้ ท่านรู้สึกเบื่อ ทำอะไรก็ไม่เพลิดเพลินหรือไม่"
+    ];
+
     const q9List = [
         "เบื่อ ไม่สนใจอยากทำอะไร",
         "ไม่สบายใจ ซึมเศร้า ท้อแท้",
@@ -266,6 +308,7 @@
         "พูดช้า ทำอะไรช้าลง หรือกระสับกระส่าย",
         "คิดทำร้ายตนเอง หรือคิดว่า ถ้าตายไปคงจะดี"
     ];
+
     const q8List = [
         { text: "คิดอยากตาย", w: 1 },
         { text: "อยากทำร้ายตัวเอง", w: 2 },
@@ -278,6 +321,36 @@
     ];
 
     function renderQuestions() {
+        // ST-5
+        let htmlST5 = '';
+        st5List.forEach((q, i) => {
+            htmlST5 += `
+            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <p class="font-medium text-gray-800 text-sm mb-2">${i+1}. ${q}</p>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                    <label class="flex items-center gap-2 bg-white p-2 border rounded cursor-pointer hover:bg-gray-50"><input type="radio" name="st5_${i+1}" value="0" checked> แทบไม่มี (0)</label>
+                    <label class="flex items-center gap-2 bg-white p-2 border rounded cursor-pointer hover:bg-gray-50"><input type="radio" name="st5_${i+1}" value="1"> เป็นบางครั้ง (1)</label>
+                    <label class="flex items-center gap-2 bg-white p-2 border rounded cursor-pointer hover:bg-gray-50"><input type="radio" name="st5_${i+1}" value="2"> บ่อยครั้ง (2)</label>
+                    <label class="flex items-center gap-2 bg-white p-2 border rounded cursor-pointer hover:bg-gray-50"><input type="radio" name="st5_${i+1}" value="3"> เป็นประจำ (3)</label>
+                </div>
+            </div>`;
+        });
+        document.getElementById('questions-st5').innerHTML = htmlST5;
+
+        // 2Q
+        let html2q = '';
+        q2List.forEach((q, i) => {
+            html2q += `
+            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <p class="font-medium text-gray-800 text-sm">${i+1}. ${q}</p>
+                <div class="flex gap-3 text-xs shrink-0">
+                    <label class="flex items-center gap-2 bg-white px-4 py-2 border rounded cursor-pointer hover:bg-gray-50"><input type="radio" name="q2_${i+1}" value="0" checked onchange="update2QFlow()"> ไม่มี</label>
+                    <label class="flex items-center gap-2 bg-white px-4 py-2 border rounded cursor-pointer hover:bg-gray-50"><input type="radio" name="q2_${i+1}" value="1" onchange="update2QFlow()"> มี</label>
+                </div>
+            </div>`;
+        });
+        document.getElementById('questions-2q').innerHTML = html2q;
+
         // 9Q
         let html9q = '';
         q9List.forEach((q, i) => {
@@ -309,6 +382,33 @@
         document.getElementById('questions-8q').innerHTML = html8q;
     }
     renderQuestions();
+
+    function get2QScore() {
+        let score = 0;
+        for (let i = 1; i <= 2; i++) {
+            score += parseInt(document.querySelector(`input[name="q2_${i}"]:checked`)?.value || 0);
+        }
+        return score;
+    }
+
+    function update2QFlow() {
+        const score2Q = get2QScore();
+        const sec9 = document.getElementById('section-9q');
+        const sec8 = document.getElementById('section-8q');
+        const box = document.getElementById('result-2q-inline');
+
+        if (score2Q >= 1) {
+            sec9.classList.remove('hidden');
+            sec8.classList.remove('hidden');
+            box.className = "mt-4 p-3 rounded-lg text-sm font-semibold bg-yellow-50 text-yellow-800 border border-yellow-200";
+            box.innerText = "🟡 2Q เป็นบวก: ควรประเมินต่อด้วย 9Q และ 8Q";
+        } else {
+            sec9.classList.add('hidden');
+            sec8.classList.add('hidden');
+            box.className = "mt-4 p-3 rounded-lg text-sm font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200";
+            box.innerText = "🟢 2Q ไม่พบสัญญาณเบื้องต้น: ไม่ต้องทำ 9Q/8Q ต่อ";
+        }
+    }
 
     // ==================== ส่วนที่ 3: ปัจจัยเสี่ยง ====================
     document.addEventListener('change', function(e) {
@@ -370,6 +470,7 @@
             otherText.focus();
             return;
         }
+
         const anyRiskChecked = document.querySelectorAll('.risk-checkbox:checked').length > 0;
         if (!anyRiskChecked) {
             alert("กรุณาเลือกอย่างน้อย 1 ข้อในส่วนที่ 3 (หากไม่มี ให้เลือก \"ไม่มี\")");
@@ -380,21 +481,40 @@
         btn.disabled = true;
         btn.innerText = "กำลังบันทึกข้อมูล...";
 
-        let total9Q = 0;
-        for (let i = 1; i <= 9; i++) total9Q += parseInt(document.querySelector(`input[name="q9_${i}"]:checked`).value);
-        let total8Q = 0;
-        for (let i = 1; i <= 8; i++) total8Q += parseInt(document.querySelector(`input[name="q8_${i}"]:checked`).value);
+        let totalST5 = 0;
+        for (let i = 1; i <= 5; i++) totalST5 += parseInt(document.querySelector(`input[name="st5_${i}"]:checked`).value);
 
+        const total2Q = get2QScore();
+        const is2QPositive = total2Q >= 1;
+
+        let total9Q = null;
+        let total8Q = null;
+
+        if (is2QPositive) {
+            total9Q = 0;
+            for (let i = 1; i <= 9; i++) total9Q += parseInt(document.querySelector(`input[name="q9_${i}"]:checked`).value);
+
+            total8Q = 0;
+            for (let i = 1; i <= 8; i++) total8Q += parseInt(document.querySelector(`input[name="q8_${i}"]:checked`).value);
+        }
+
+        // กลุ่มสีรวม:
+        // แดง = 9Q >= 13 หรือ 8Q >= 9
+        // เหลือง = ST-5 >= 8 หรือ 9Q 7-12 หรือ 8Q 1-8
+        // เขียว = ไม่เข้าเกณฑ์ข้างต้น
         let colorStatus = "green";
-        if (total9Q >= 13 || total8Q >= 9) colorStatus = "red";
-        else if ((total9Q >= 7 && total9Q <= 12) || (total8Q >= 1 && total8Q <= 8)) colorStatus = "yellow";
+        if ((total9Q !== null && total9Q >= 13) || (total8Q !== null && total8Q >= 9)) {
+            colorStatus = "red";
+        } else if (totalST5 >= 8 || (total9Q !== null && total9Q >= 7) || (total8Q !== null && total8Q >= 1)) {
+            colorStatus = "yellow";
+        }
 
         // รวบรวมปัจจัยเสี่ยงที่เลือกในส่วนที่ 3
         let riskFactors = Array.from(document.querySelectorAll('.risk-checkbox:checked')).map(cb => cb.value);
         riskFactors = riskFactors.map(v => v === "อื่นๆ" ? `อื่นๆ: ${otherText.value.trim()}` : v);
         const riskFactorsText = riskFactors.join(", ");
 
-        // สร้างรหัสอ้างอิงเฉพาะรายการนี้ ใช้สำหรับลบข้อมูลภายหลัง
+        // สร้างรหัสอ้างอิงเฉพาะรายการนี้
         const clientId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
         const payload = {
@@ -404,54 +524,116 @@
             unit:       document.getElementById('unit').value.trim(),
             phone:      document.getElementById('phone').value.trim(),
             job:        document.getElementById('job').value.trim(),
-            score9Q:    total9Q,
-            score8Q:    total8Q,
+
+            scoreST5:   totalST5,
+            resultST5:  getST5Result(totalST5),
+            score2Q:    total2Q,
+            result2Q:   is2QPositive ? "2Q เป็นบวก" : "2Q ไม่พบสัญญาณเบื้องต้น",
+
+            score9Q:    total9Q === null ? "" : total9Q,
+            score8Q:    total8Q === null ? "" : total8Q,
             colorGroup: colorStatus,
             riskFactors: riskFactorsText
         };
 
         // แสดงผลทันที
-        showVisualResult(total9Q, total8Q, colorStatus);
-        // บันทึกเข้า Google Sheets ในเบื้องหลัง
+        showVisualResult(totalST5, total2Q, total9Q, total8Q, colorStatus);
 
+        // บันทึกเข้า Google Sheets ในเบื้องหลัง
         fetch(SHEET_API_URL, {
             method: "POST",
-            mode: "no-cors",          // Apps Script ต้องการ no-cors
+            mode: "no-cors",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
         }).catch(err => console.error("บันทึกไม่สำเร็จ:", err));
     }
 
-    function showVisualResult(total9Q, total8Q, colorStatus) {
+    function getST5Result(score) {
+        if (score <= 4) return "เครียดน้อย";
+        if (score <= 7) return "เครียดปานกลาง";
+        if (score <= 9) return "เครียดมาก";
+        return "เครียดมากที่สุด";
+    }
+
+    function showVisualResult(totalST5, total2Q, total9Q, total8Q, colorStatus) {
         document.getElementById('step-2').classList.add('hidden');
-        document.getElementById('score-9q').innerText = total9Q;
-        document.getElementById('score-8q').innerText = total8Q;
+
+        document.getElementById('score-st5').innerText = totalST5;
+        document.getElementById('score-2q').innerText = total2Q;
+        document.getElementById('score-9q').innerText = total9Q === null ? "-" : total9Q;
+        document.getElementById('score-8q').innerText = total8Q === null ? "-" : total8Q;
+
+        const bST5 = document.getElementById('badge-st5');
+        if (totalST5 <= 4) {
+            bST5.innerText = "🟢 เครียดน้อย";
+            bST5.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-emerald-100 text-emerald-800";
+        } else if (totalST5 <= 7) {
+            bST5.innerText = "🟡 เครียดปานกลาง";
+            bST5.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-yellow-100 text-yellow-800";
+        } else if (totalST5 <= 9) {
+            bST5.innerText = "🟠 เครียดมาก";
+            bST5.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-orange-100 text-orange-800";
+        } else {
+            bST5.innerText = "🔴 เครียดมากที่สุด";
+            bST5.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-red-100 text-red-800";
+        }
+
+        const b2 = document.getElementById('badge-2q');
+        if (total2Q === 0) {
+            b2.innerText = "🟢 ไม่พบสัญญาณเบื้องต้น";
+            b2.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-emerald-100 text-emerald-800";
+        } else {
+            b2.innerText = "🟡 2Q เป็นบวก";
+            b2.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-yellow-100 text-yellow-800";
+        }
 
         const b9 = document.getElementById('badge-9q');
-        if (total9Q < 7)       { b9.innerText = "🟢 ปกติ";          b9.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-emerald-100 text-emerald-800"; }
-        else if (total9Q <= 12){ b9.innerText = "🟡 เฝ้าระวัง";     b9.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-yellow-100 text-yellow-800"; }
-        else                   { b9.innerText = "🔴 ซึมเศร้ารุนแรง"; b9.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-red-100 text-red-800"; }
+        if (total9Q === null) {
+            b9.innerText = "ไม่ต้องทำ 9Q";
+            b9.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-gray-100 text-gray-600";
+        } else if (total9Q < 7) {
+            b9.innerText = "🟢 ปกติ";
+            b9.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-emerald-100 text-emerald-800";
+        } else if (total9Q <= 12) {
+            b9.innerText = "🟡 เฝ้าระวัง";
+            b9.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-yellow-100 text-yellow-800";
+        } else {
+            b9.innerText = "🔴 ซึมเศร้ารุนแรง";
+            b9.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-red-100 text-red-800";
+        }
 
         const b8 = document.getElementById('badge-8q');
-        if (total8Q === 0)     { b8.innerText = "🟢 ไม่มีแนวโน้ม"; b8.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-emerald-100 text-emerald-800"; }
-        else if (total8Q <= 8) { b8.innerText = "🟡 เสี่ยงน้อย";    b8.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-yellow-100 text-yellow-800"; }
-        else                   { b8.innerText = "🔴 เสี่ยงรุนแรง";  b8.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-red-100 text-red-800"; }
+        if (total8Q === null) {
+            b8.innerText = "ไม่ต้องทำ 8Q";
+            b8.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-gray-100 text-gray-600";
+        } else if (total8Q === 0) {
+            b8.innerText = "🟢 ไม่มีแนวโน้ม";
+            b8.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-emerald-100 text-emerald-800";
+        } else if (total8Q <= 8) {
+            b8.innerText = "🟡 เสี่ยงน้อย";
+            b8.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-yellow-100 text-yellow-800";
+        } else {
+            b8.innerText = "🔴 เสี่ยงรุนแรง";
+            b8.className = "inline-block px-3 py-1 text-xs font-bold rounded-full mt-2 bg-red-100 text-red-800";
+        }
 
         const sec = document.getElementById('result-section');
         const adv = document.getElementById('color-advice');
+
         if (colorStatus === "green") {
             sec.className = "mt-8 p-6 rounded-lg border-2 text-center space-y-4 bg-emerald-50 border-emerald-500 text-emerald-900";
-            adv.innerText = "✅ ข้อแนะนำ: สังเกตอาการตามปกติ";
+            adv.innerText = "✅ ข้อแนะนำ: สังเกตอาการและดูแลสุขภาพจิตตามปกติ";
             adv.className = "text-sm font-semibold p-3 rounded max-w-md mx-auto mt-2 bg-emerald-100 text-emerald-800";
         } else if (colorStatus === "yellow") {
             sec.className = "mt-8 p-6 rounded-lg border-2 text-center space-y-4 bg-yellow-50 border-yellow-500 text-yellow-900";
-            adv.innerText = "⚠️ ข้อแนะนำ: กลุ่มเสี่ยงเฝ้าระวัง ให้การดูแลใกล้ชิด";
+            adv.innerText = "⚠️ ข้อแนะนำ: อยู่ในกลุ่มที่ควรเฝ้าระวัง/ติดตาม และพิจารณาประเมินเพิ่มเติมตามปัญหาที่พบ";
             adv.className = "text-sm font-semibold p-3 rounded max-w-md mx-auto mt-2 bg-yellow-100 text-yellow-800";
         } else {
             sec.className = "mt-8 p-6 rounded-lg border-2 text-center space-y-4 bg-red-50 border-red-500 text-red-900";
-            adv.innerText = "🚨 ข้อแนะนำ: กลุ่มอันตราย ควรส่งพบจิตแพทย์ทันที";
+            adv.innerText = "🚨 ข้อแนะนำ: พบระดับความเสี่ยงสูง ควรเข้าสู่กระบวนการประเมินและส่งต่อโดยบุคลากรสุขภาพตามแนวทางของหน่วยงาน";
             adv.className = "text-sm font-semibold p-3 rounded max-w-md mx-auto mt-2 bg-red-100 text-red-800";
         }
+
         sec.classList.remove('hidden');
     }
 
@@ -495,7 +677,7 @@
   const tbody = document.getElementById('admin-table-body');
 
   tbody.innerHTML =
-    '<tr><td colspan="12" class="text-center py-8 text-gray-400">⏳ กำลังโหลดข้อมูลจาก Google Sheets...</td></tr>';
+    '<tr><td colspan="13" class="text-center py-8 text-gray-400">⏳ กำลังโหลดข้อมูลจาก Google Sheets...</td></tr>';
 
   const callbackName = "gasCallback_" + Date.now();
 
@@ -513,7 +695,7 @@
 
       tbody.innerHTML =
         `<tr>
-          <td colspan="12" class="text-center py-8 text-red-500">
+          <td colspan="13" class="text-center py-8 text-red-500">
             ❌ โหลดข้อมูลไม่สำเร็จ: ${err.message}
           </td>
         </tr>`;
@@ -541,7 +723,7 @@
 
     tbody.innerHTML =
       `<tr>
-        <td colspan="12" class="text-center py-8 text-red-500">
+        <td colspan="13" class="text-center py-8 text-red-500">
           ❌ เชื่อมต่อ Google Apps Script ไม่สำเร็จ
         </td>
       </tr>`;
@@ -609,7 +791,7 @@
     function renderRows(data) {
         const tbody = document.getElementById('admin-table-body');
         if (data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="11" class="text-center py-8 text-gray-400">ไม่พบข้อมูล</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="13" class="text-center py-8 text-gray-400">ไม่พบข้อมูล</td></tr>';
             return;
         }
         const dupCounts = findDuplicateKeys(data);
@@ -637,8 +819,10 @@
                 <td class="px-3 py-3">${row.unit || '-'}</td>
                 <td class="px-3 py-3">${row.phone || '-'}</td>
                 <td class="px-3 py-3">${row.job || '-'}</td>
-                <td class="px-3 py-3 font-bold text-center">${row.score9Q ?? '-'}</td>
-                <td class="px-3 py-3 font-bold text-center">${row.score8Q ?? '-'}</td>
+                <td class="px-3 py-3 font-bold text-center">${row.scoreST5 ?? '-'}</td>
+                <td class="px-3 py-3 font-bold text-center">${row.score2Q ?? '-'}</td>
+                <td class="px-3 py-3 font-bold text-center">${row.score9Q === "" || row.score9Q == null ? '-' : row.score9Q}</td>
+                <td class="px-3 py-3 font-bold text-center">${row.score8Q === "" || row.score8Q == null ? '-' : row.score8Q}</td>
                 <td class="px-3 py-3">${badge}</td>
                 <td class="px-3 py-3 text-xs max-w-[180px]">${row.riskFactors || '-'}</td>
                 <td class="px-3 py-3 text-center">${dupBadge}</td>
@@ -744,9 +928,13 @@
             'หน่วยงาน/สังกัด':            r.unit || '',
             'เบอร์โทร':                   r.phone || '',
             'ตำแหน่งงาน':                 r.job || '',
+            'คะแนน ST-5':                  r.scoreST5 ?? '',
+            'ผล ST-5':                     r.resultST5 || '',
+            'คะแนน 2Q':                    r.score2Q ?? '',
+            'ผล 2Q':                       r.result2Q || '',
             'คะแนน 9Q (ซึมเศร้า)':        r.score9Q ?? '',
             'คะแนน 8Q (แนวโน้มฆ่าตัวตาย)': r.score8Q ?? '',
-            'กลุ่มสี':                    r.colorGroup || '',
+            'กลุ่มสี':                    r.colorGroup || '', 
             'ปัจจัย/ปัญหาที่ส่งผลกระทบ':   r.riskFactors || ''
         }));
 
@@ -754,7 +942,8 @@
         const ws = XLSX.utils.json_to_sheet(exportData);
         ws['!cols'] = [
             { wch: 20 }, { wch: 12 }, { wch: 22 }, { wch: 20 },
-            { wch: 14 }, { wch: 24 }, { wch: 18 }, { wch: 22 }, { wch: 18 }, { wch: 40 }
+            { wch: 14 }, { wch: 24 }, { wch: 12 }, { wch: 18 },
+            { wch: 12 }, { wch: 24 }, { wch: 18 }, { wch: 22 }, { wch: 18 }, { wch: 40 }
         ];
         XLSX.utils.book_append_sheet(wb, ws, "ผลการประเมิน");
 
